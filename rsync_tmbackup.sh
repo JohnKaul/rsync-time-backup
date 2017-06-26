@@ -58,7 +58,7 @@ fn_expire_backup() {
     fi
 
     fn_log_info "Expiring $1"
-    fn_rm "$1"
+    fn_rmdir "$1"
 }
 
 fn_parse_ssh() {
@@ -91,6 +91,17 @@ fn_get_absolute_path() {
 
 fn_mkdir() {
     fn_run_cmd "mkdir -p -- $1"
+}
+
+fn_rmdir() {
+        # NOTES: using RM to delete a directory and a large amount of
+        # files is slow and sometimes impossible so I propose the use
+        # of rsync to delete the files and use RM to do the last bit
+        # of cleanup -i.e. deleting the empty directories.
+    rn_run_cmd "mkdir emptydir"
+    rn_run_cmd "rsync -a --delete emptydir/ $1/"
+    rn_run_cmd "rm -rf -- emptydir"
+    fn_run_cmd "rm -rf -- $1"
 }
 
 fn_rm() {
