@@ -98,9 +98,9 @@ fn_rmdir() {
         # files is slow and sometimes impossible so I propose the use
         # of rsync to delete the files and use RM to do the last bit
         # of cleanup -i.e. deleting the empty directories.
-    rn_run_cmd "mkdir emptydir"
-    rn_run_cmd "rsync -a --delete emptydir/ $1/"
-    rn_run_cmd "rm -rf -- emptydir"
+    fn_run_cmd "mkdir emptydir"
+    fn_run_cmd "rsync -a --delete emptydir/ $1/"
+    fn_run_cmd "rm -rf -- emptydir"
     fn_run_cmd "rm -rf -- $1"
 }
 
