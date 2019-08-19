@@ -45,6 +45,10 @@ fn_parse_date() {
     esac
 }
 
+fn_find_exclusions() {
+      fn_run_cmd  "find "$SRC_FOLDER" -iname ".NOBACKUP""
+}
+
 fn_find_backups() {
     fn_run_cmd "find "$DEST_FOLDER" -type d -name "????-??-??-??????" -prune | sort -r"
 }
@@ -399,6 +403,8 @@ while : ; do
     # Start backup
     # -----------------------------------------------------------------------------
 
+    IGNORE_DIRS="$(fn_find_exclusions)"
+    IGNORE_DIRS="${IGNORE_DIRS%/*}"
 
     if [ !$DRY_RUN != true ]; then
         LOG_FILE="$PROFILE_FOLDER/$(date +"%Y-%m-%d-%H%M%S").log"
@@ -406,6 +412,7 @@ while : ; do
         fn_log_info "Starting backup..."
         fn_log_info "From: $SRC_FOLDER"
         fn_log_info "To:   $SSH_FOLDER_PREFIX$DEST"
+        fn_log_info "Ignoring: $IGNORE_DIRS"
     fi
 
     CMD="rsync"
@@ -441,6 +448,11 @@ while : ; do
             done
         fi
     fi
+
+    if [ -n "$IGNORE_DIRS" ]; then
+        CMD="$CMD --exclude $IGNORE_DIRS"
+    fi
+
     CMD="$CMD $LINK_DEST_OPTION"
     CMD="$CMD -- '$SRC_FOLDER/' '$SSH_FOLDER_PREFIX$DEST/'"
     CMD="$CMD | grep -E '^deleting|[^/]$'"
